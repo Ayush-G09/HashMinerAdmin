@@ -1,35 +1,141 @@
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from "react";
+import { TransactionType, UserRequestType } from "./Request";
+import styled from "styled-components";
 
-function UserRequest() {
-    const [open, setOpen] = useState<boolean>(false);
+type Props = {
+  requests: UserRequestType[];
+};
+
+const RequestContainer = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: #1d1d1d;
+  border-radius: 5px;
+`;
+
+const HeaderContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const PendingCount = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  background-color: darkorange;
+  font-weight: bold;
+  border-radius: 50%;
+  margin-left: auto;
+`;
+
+const Label = styled.label`
+  font-size: 1.2rem;
+  font-weight: bold;
+`;
+
+const ChevronContainer = styled.div`
+  box-sizing: border-box;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const TransactionContainer = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const TransactionItem = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  gap: 3rem;
+  align-items: center;
+  background-color: #2c2c2c;
+  margin-top: 0.5rem;
+  border-radius: 5px;
+`;
+
+const Select = styled.select`
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+`;
+
+type TransactionProps = {
+  transaction: TransactionType;
+};
+
+function Transaction({ transaction }: TransactionProps) {
+    const [status, setStatus] = useState<"Completed" | "Pending">(transaction.status);
+  
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setStatus(e.target.value as "Completed" | "Pending"); // Update the status
+    };
+  
+    return (
+      <TransactionContainer key={transaction._id}>
+        <TransactionItem>
+          <label>{transaction.type}</label>
+          <label style={{ marginLeft: "auto" }}>{transaction.title}</label>
+          <label>{transaction.date}</label>
+          <label>{transaction.to}</label>
+          <Select value={status} onChange={handleStatusChange} style={{backgroundColor: status === 'Completed' ? "limegreen" : "darkorange"}}>
+            <option value="Pending" style={{ background: "white", color: "black" }}>
+              Pending
+            </option>
+            <option value="Completed" style={{ background: "white", color: "black" }}>
+              Completed
+            </option>
+          </Select>
+        </TransactionItem>
+      </TransactionContainer>
+    );
+  }
+
+function UserRequest({ requests }: Props) {
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
-     <div style={{width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0.5rem', backgroundColor: '#1D1D1D', borderRadius: '5px'}}>
-        <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: '1rem'}}>
-            <label style={{fontSize: '1.2rem', fontWeight: 'bold'}}>Username</label>
-            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', width: '2rem', height: '2rem', backgroundColor: 'darkorange', fontWeight: 'bold', borderRadius: '50%', marginLeft: 'auto'}}>1</div>
-            <label style={{fontSize: '1rem', fontWeight: 'bold'}}>Pending Request</label>
-            <div onClick={() => setOpen(!open)} style={{boxSizing: 'border-box', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>
-                <FontAwesomeIcon icon={faChevronDown}/>
-            </div>
-        </div>
-        {open && 
-            <div style={{width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                <div style={{display: 'flex', boxSizing: 'border-box', padding: '0.5rem', gap: '3rem', alignItems: 'center', backgroundColor: '#2C2C2C', marginTop: '0.5rem', borderRadius: '5px'}}>
-                    <label>Miner</label>
-                    <label style={{marginLeft: 'auto'}}>Miner 1</label>
-                    <label>12-12-12</label>
-                    <label>ayushgokhle@oksbi</label>
-                    <select style={{padding: '0.5rem', borderRadius: '5px', cursor: 'pointer', outline: 'none', border: 'none', backgroundColor: 'green', color: 'white', fontWeight: 'bold'}}>
-                        <option style={{background: 'white', color: 'black'}}>Pending</option>
-                        <option style={{background: 'white', color: 'black'}}>Completed</option>
-                    </select>
-                </div>
-            </div>
-        }
-    </div>
-  )
+    <>
+      {requests.map((request) => (
+        <RequestContainer key={request._id}>
+          <HeaderContainer>
+            <Label>{request.username}</Label>
+            <PendingCount>{request.pendingTransactions.length}</PendingCount>
+            <Label>Pending Request</Label>
+            <ChevronContainer onClick={() => setOpen(!open)}>
+              <FontAwesomeIcon icon={faChevronDown} />
+            </ChevronContainer>
+          </HeaderContainer>
+          {open &&
+            request.pendingTransactions.map((trans) => (
+              <Transaction transaction={trans} />
+            ))}
+        </RequestContainer>
+      ))}
+    </>
+  );
 }
 
-export default UserRequest
+export default UserRequest;
