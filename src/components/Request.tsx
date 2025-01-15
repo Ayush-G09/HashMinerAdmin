@@ -17,11 +17,10 @@ function Request() {
     requests: [],
   });
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://hash-miner-backend.vercel.app/api/auth//user-pending-transactions");
+        const response = await axios.get("https://hash-miner-backend.vercel.app/api/auth/user-pending-transactions");
         setState((prev) => ({...prev, requests: response.data.data}));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -30,6 +29,7 @@ function Request() {
 
     fetchData();
   }, []); 
+
   return (
     <Container>
       <label style={{ fontSize: "1.2rem", fontWeight: "bold" }}>

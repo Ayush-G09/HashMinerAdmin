@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { MoonLoader } from "react-spinners";
 import styled from "styled-components";
 
@@ -7,14 +7,23 @@ type State = {
   users: number;
   loading: boolean;
   pending: number;
+  balance: {value: number; loading: boolean};
 };
 
-function Info() {
+type Props = {
+  price: number;
+  loading: boolean;
+};
+
+function Info({price, loading}: Props) {
+
   const [state, setState] = useState<State>({
     users: 0,
     loading: false,
     pending: 0,
+    balance: {value: 0, loading: false},
   });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,13 +37,26 @@ function Info() {
       }
     };
 
+    const fetchBalance = async () => {
+      try {
+        setState((prev) => ({...prev, balance: {...prev.balance, loading: true}}));
+        const response = await axios.get("https://hash-miner-backend.vercel.app/api/auth/get-balance");
+        setState((prev) => ({...prev, balance: {...prev.balance, value: response.data.balance}}));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setState((prev) => ({...prev, balance: {...prev.balance, loading: false}}));
+      }
+    };
+
     fetchData();
+    fetchBalance();
   }, []); 
   
   return (
     <Container>
       <Card style={{ backgroundColor: "#2C89DC" }}>
-        <Content>50</Content>
+        <Content>{loading ? <MoonLoader size={24} color="white" /> : price }</Content>
         <Title>Hash Coin Price</Title>
       </Card>
       <Card style={{ backgroundColor: "#6761DA" }}>
@@ -46,7 +68,7 @@ function Info() {
         <Title>Total Users</Title>
       </Card>
       <Card style={{ backgroundColor: "#D04A4A" }}>
-        <Content>220000</Content>
+        <Content>{state.balance.loading ? <MoonLoader size={24} color="white" /> : state.balance.value }</Content>
         <Title>Total Balance</Title>
       </Card>
     </Container>

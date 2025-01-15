@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { TransactionType, UserRequestType } from "./Request";
 import styled from "styled-components";
+import axios from "axios";
 
 type Props = {
   requests: UserRequestType[];
@@ -84,17 +85,32 @@ const Select = styled.select`
 
 type TransactionProps = {
   transaction: TransactionType;
+  userId: string;
 };
 
-function Transaction({ transaction }: TransactionProps) {
+function Transaction({ transaction, userId }: TransactionProps) {
     const [status, setStatus] = useState<"Completed" | "Pending">(transaction.status);
   
     const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setStatus(e.target.value as "Completed" | "Pending"); // Update the status
+      if(e.target.value === "Pending"){
+        return;
+      };
+      setStatus(e.target.value as "Completed" | "Pending");
+      if(e.target.value === "Completed"){
+        handleChangeStatus();
+      };
+    };
+
+    const handleChangeStatus = async () => {
+      try{
+        await axios.put(`https://hash-miner-backend.vercel.app/api/auth/transactions/${userId}/${transaction._id}`, {status: 'Completed'});
+      }catch{
+        console.log('error')
+      }
     };
   
     return (
-      <TransactionContainer key={transaction._id}>
+      <TransactionContainer>
         <TransactionItem>
           <label>{transaction.type}</label>
           <label style={{ marginLeft: "auto" }}>{transaction.title}</label>
@@ -130,7 +146,7 @@ function UserRequest({ requests }: Props) {
           </HeaderContainer>
           {open &&
             request.pendingTransactions.map((trans) => (
-              <Transaction transaction={trans} />
+              <Transaction key={trans._id} transaction={trans} userId={request._id} />
             ))}
         </RequestContainer>
       ))}
