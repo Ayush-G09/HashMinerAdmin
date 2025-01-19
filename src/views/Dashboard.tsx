@@ -19,7 +19,7 @@ function Dashboard() {
       try {
         setState((prev) => ({...prev, loading: true}));
         const response = await axios.get("https://hash-miner-backend.vercel.app/api/auth/get-prices?period=today");
-        setState((prev) => ({...prev, price: response.data.todayPrice}));
+        setState((prev) => ({...prev, price: response.data.prices[0].price}));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
