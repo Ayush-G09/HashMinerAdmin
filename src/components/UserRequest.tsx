@@ -99,13 +99,13 @@ function Transaction({ transaction, userId }: TransactionProps) {
       setStatus(selectedValue);
     
       if (selectedValue === "Completed" || selectedValue === "Failed") {
-        handleChangeStatus();
+        handleChangeStatus(selectedValue);
       }
     };
 
-    const handleChangeStatus = async () => {
+    const handleChangeStatus = async (value: "Completed" | "Pending" | "Failed") => {
       try{
-        await axios.put(`https://hash-miner-backend.vercel.app/api/auth/transactions/${userId}/${transaction._id}`, {status: status});
+        await axios.put(`https://hash-miner-backend.vercel.app/api/auth/transactions/${userId}/${transaction._id}`, {status: value});
       }catch{
         console.log('error')
       }
