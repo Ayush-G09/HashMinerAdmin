@@ -3,7 +3,7 @@ import UserRequest from "./UserRequest";
 import styled from "styled-components";
 import axios from "axios";
 
-export type TransactionType = {type: 'Coin' | 'Miner', title: string, date: string, status: "Completed" | "Pending", amount: number, to: string, _id: string};
+export type TransactionType = {type: 'Coin' | 'Miner', title: string, date: string, status: "Completed" | "Pending" | "Failed", amount: number, to: string, _id: string};
 
 export type UserRequestType = {_id: string, username: string, pendingTransactions: TransactionType[]};
 

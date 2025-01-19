@@ -89,21 +89,23 @@ type TransactionProps = {
 };
 
 function Transaction({ transaction, userId }: TransactionProps) {
-    const [status, setStatus] = useState<"Completed" | "Pending">(transaction.status);
+    const [status, setStatus] = useState<"Completed" | "Pending" | "Failed">(transaction.status);
   
     const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      if(e.target.value === "Pending"){
-        return;
-      };
-      setStatus(e.target.value as "Completed" | "Pending");
-      if(e.target.value === "Completed"){
+      const selectedValue = e.target.value as "Completed" | "Pending" | "Failed";
+      
+      if (selectedValue === "Pending") return;
+    
+      setStatus(selectedValue);
+    
+      if (selectedValue === "Completed" || selectedValue === "Failed") {
         handleChangeStatus();
-      };
+      }
     };
 
     const handleChangeStatus = async () => {
       try{
-        await axios.put(`https://hash-miner-backend.vercel.app/api/auth/transactions/${userId}/${transaction._id}`, {status: 'Completed'});
+        await axios.put(`https://hash-miner-backend.vercel.app/api/auth/transactions/${userId}/${transaction._id}`, {status: status});
       }catch{
         console.log('error')
       }
@@ -116,12 +118,15 @@ function Transaction({ transaction, userId }: TransactionProps) {
           <label style={{ marginLeft: "auto" }}>{transaction.title}</label>
           <label>{transaction.date}</label>
           <label>{transaction.to}</label>
-          <Select value={status} onChange={handleStatusChange} style={{backgroundColor: status === 'Completed' ? "limegreen" : "darkorange"}}>
+          <Select value={status} onChange={handleStatusChange} style={{backgroundColor: status === 'Completed' ? "limegreen" : status === 'Pending' ? "darkorange" : "crimson"}}>
             <option value="Pending" style={{ background: "white", color: "black" }}>
               Pending
             </option>
             <option value="Completed" style={{ background: "white", color: "black" }}>
               Completed
+            </option>
+            <option value="Failed" style={{ background: "white", color: "black" }}>
+              Failed
             </option>
           </Select>
         </TransactionItem>
