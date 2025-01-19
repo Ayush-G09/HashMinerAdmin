@@ -93,6 +93,8 @@ function Transaction({ transaction, userId }: TransactionProps) {
   
     const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const selectedValue = e.target.value as "Completed" | "Pending" | "Failed";
+
+      if(status !== "Pending") return;
       
       if (selectedValue === "Pending") return;
     
